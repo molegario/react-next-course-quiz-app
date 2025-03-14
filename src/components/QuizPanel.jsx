@@ -1,110 +1,19 @@
-import { useState, useCallback } from "react";
-import QUESTIONS from "../questions";
+import { useContext } from "react";
 import QuestionTimer from "./QuestionTimer";
 import ResultsPanel from "./ResultsPanel";
-
-const shuffleArray = (Arr) => {
-  const newStack = [...Arr];
-  let currentIndex = newStack.length;
-  while (currentIndex !== 0) {
-    const randomIndex = Math.floor(Math.random() * currentIndex);
-    currentIndex -= 1;
-    const tempValue = newStack[currentIndex];
-    newStack[currentIndex] = newStack[randomIndex];
-    newStack[randomIndex] = tempValue;
-  }
-  return newStack;
-};
-
-const getShuffledQuestions = () => {
-  const shuffledQuestions = shuffleArray([...QUESTIONS]);
-  const withShuffledAnswers = shuffledQuestions.map((question) => {
-    const shuffledAnswers = shuffleArray(question.answers);
-    return {
-      ...question,
-      answers: shuffledAnswers,
-    };
-  });
-  return withShuffledAnswers;
-};
-
-const initialquestions = getShuffledQuestions();
+import { QuizContext } from "../context/quiz-context";
 
 const QuizPanel = () => {
-  const [questions, setQuestions] = useState(initialquestions);
-  const [userAnswers, setUserAnswers] = useState([]);
-  const [answeredState, setAnsweredState] = useState("");
-
-  const activeQuestionIndex =
-    answeredState === "" ? userAnswers.length : userAnswers.length - 1;
-  const currentQuestion = questions[activeQuestionIndex];
-  const quizCompleted = activeQuestionIndex === questions.length;
-
-  const resetQuiz = () => {
-    setQuestions(getShuffledQuestions());
-    setUserAnswers([]);
-    setAnsweredState("");
-  };
-
-  const handleSelectAnswer = useCallback(
-    (ans) => {
-      const question = questions[activeQuestionIndex];
-      const questionSource = QUESTIONS.find((q) => q.id === question.id);
-      const result = questionSource?.answers[0] === ans;
-
-      setAnsweredState("answered");
-
-      setUserAnswers((prevAnswers) => {
-        return [
-          ...prevAnswers,
-          {
-            questionId: question.id,
-            answer: ans,
-            result,
-          },
-        ];
-      });
-
-      setTimeout(() => {
-        if (result) {
-          setAnsweredState("answered_correct");
-        } else {
-          setAnsweredState("answered_wrong");
-        }
-
-        setTimeout(() => {
-          setAnsweredState("");
-        }, 2000);
-
-      }, 1000);
-
-    },
-    [activeQuestionIndex]
-  );
-
-  const getClassState = useCallback(
-    (ans) => {
-      const question = questions[activeQuestionIndex];
-      const qid = question.id;
-      const answer = userAnswers.find((ua) => ua.questionId === qid);
-
-      if (answer?.answer === ans) {
-        if (answeredState === "answered") {
-          return "selected";
-        } else {
-          return answer.result ? "correct" : "wrong";
-        }
-      } else {
-        return "";
-      }
-    },
-    [userAnswers, answeredState, activeQuestionIndex]
-  );
-
-  const handleSkipAnswer = useCallback(
-    () => handleSelectAnswer(null),
-    [handleSelectAnswer]
-  );
+  const {
+    userAnswers,
+    answeredState,
+    currentQuestion,
+    quizCompleted,
+    handleSelectAnswer,
+    handleSkipAnswer,
+    getClassState,
+    resetQuiz,
+  } = useContext(QuizContext);
 
   if (quizCompleted) {
     return <ResultsPanel userAnswers={userAnswers} resetQuiz={resetQuiz}/>;
