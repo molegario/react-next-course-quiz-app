@@ -1,25 +1,18 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
+import { QuizContext } from "../context/quiz-context";
 
 const QuestionTimer = ({
   duration = 10 * 1000,
-  onTimeOut = () => {},
 }) => {
+  const { handleSkipAnswer } = useContext(QuizContext);
   const [timerRemaining, setTimeRemaining] = useState(duration);
 
-  useEffect(
-    () => {
-      const timer = setTimeout(
-        () => {
-          onTimeOut();
-        },
-        duration
-      );
-      return () => {
-        clearTimeout(timer);
-      };
-    },
-    [onTimeOut, duration]
-  );
+  useEffect(() => {
+    const timer = setTimeout(() => handleSkipAnswer(), duration);
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [handleSkipAnswer, duration]);
 
   useEffect(
     () => {

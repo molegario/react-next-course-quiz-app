@@ -1,7 +1,15 @@
 import QuizCompletedImg from "../assets/quiz-complete.png";
 import QUESTIONS from "../questions.js";
+import { QuizContext } from "../context/quiz-context.jsx";
+import { useContext } from "react"; 
 
-const ResultsPanel = ({ userAnswers, resetQuiz }) => {
+const ResultsPanel = () => {
+  const {
+    userAnswers,
+    resetQuiz
+  } = useContext(QuizContext);
+
+
   const answersWithQuestions = userAnswers.map(
     ua => {
       return {
