@@ -1,7 +1,7 @@
 import { useState, useCallback } from "react";
 import QUESTIONS from "../questions";
-import QuizCompletedImg from "../assets/quiz-complete.png";
 import QuestionTimer from "./QuestionTimer";
+import ResultsPanel from "./ResultsPanel";
 
 const shuffleArray = (Arr) => {
   const newStack = [...Arr];
@@ -28,9 +28,10 @@ const getShuffledQuestions = () => {
   return withShuffledAnswers;
 };
 
-const questions = getShuffledQuestions();
+const initialquestions = getShuffledQuestions();
 
 const QuizPanel = () => {
+  const [questions, setQuestions] = useState(initialquestions);
   const [userAnswers, setUserAnswers] = useState([]);
   const [answeredState, setAnsweredState] = useState("");
 
@@ -38,6 +39,12 @@ const QuizPanel = () => {
     answeredState === "" ? userAnswers.length : userAnswers.length - 1;
   const currentQuestion = questions[activeQuestionIndex];
   const quizCompleted = activeQuestionIndex === questions.length;
+
+  const resetQuiz = () => {
+    setQuestions(getShuffledQuestions());
+    setUserAnswers([]);
+    setAnsweredState("");
+  };
 
   const handleSelectAnswer = useCallback(
     (ans) => {
@@ -100,12 +107,7 @@ const QuizPanel = () => {
   );
 
   if (quizCompleted) {
-    return (
-      <div id="summary">
-        <img src={QuizCompletedImg} alt="quiz completed" />
-        <h2>Quiz Completed!</h2>
-      </div>
-    );
+    return <ResultsPanel userAnswers={userAnswers} resetQuiz={resetQuiz}/>;
   }
 
   return (
@@ -129,6 +131,14 @@ const QuizPanel = () => {
               </button>
             </li>
           ))}
+          <li className="answer">
+            <button
+              onClick={handleSkipAnswer}
+              disabled={quizCompleted || answeredState !== ""}
+            >
+              Skip &#62; &#62;
+            </button>
+          </li>
         </ul>
       </div>
     </div>
