@@ -17,11 +17,11 @@ const QuizPanel = () => {
 
   return (
     <div id="quiz">
-      <QuestionTimer
-        key={currentQuestion.id}
-        duration={10 * 1000}
-      />
       <div id="question">
+        <QuestionTimer
+          key={currentQuestion.id}
+          duration={10 * 1000}
+        />
         <h2>{currentQuestion.text}</h2>
         <ul id="answers">
           {currentQuestion.answers.map((answer, idx) => (

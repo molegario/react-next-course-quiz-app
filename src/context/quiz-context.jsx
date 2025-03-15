@@ -97,6 +97,8 @@ const QuizContextProvider = ({ children }) => {
       const questionSource = QUESTIONS.find((q) => q.id === question.id);
       const result = questionSource?.answers[0] === ans;
 
+      console.log("handleSelectAnswer::", ans, result);
+
       quizStateReducer({ type: "UPDATE_ANSWERED", payload: { answerstatus: "answered" } });
 
       quizStateReducer({

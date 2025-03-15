@@ -5,50 +5,54 @@ const QuestionTimer = ({
   duration = 10 * 1000,
 }) => {
   const timerRef = useRef();
-  const intervalRef = useRef();
   const { handleSkipAnswer, answeredState } = useContext(QuizContext);
   const [timerRemaining, setTimeRemaining] = useState(duration);
 
-  useEffect(
-    () => {
-      if (answeredState !== "") {
-        clearTimeout(timerRef.current);
-      }
-    },
-    [answeredState]
-  )
+  let timer = duration;
+
+  if (answeredState === 'answered') {
+    timer = 1000;
+  }
+
+  if (answeredState === 'answered_wrong' || answeredState === 'answered_correct') {
+    timer = 2000;
+  }
 
   useEffect(() => {
-    timerRef.current = setTimeout(() => handleSkipAnswer(), duration);
+    if (timer === duration) { //only set the timeout timer if timer is at first stage (timer = duration)
+      timerRef.current = setTimeout(() => handleSkipAnswer(), timer);
+    } else { //reset interval timer to new timer value (stage 2 & 3)
+      setTimeRemaining(timer);
+    }
     return () => {
-      clearTimeout(timerRef.current);
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+        timerRef.current = undefined; //prevent re-clearing of timerRef.current
+      }
     };
-  }, [handleSkipAnswer, duration]);
+  }, [handleSkipAnswer, timer, duration]);
 
   useEffect(
     () => {
-      intervalRef.current = setInterval(
+      const intervalTimer = setInterval(
         () => {
           setTimeRemaining(
             prevTime => {
               const newTime = prevTime - 100;
-              if(newTime <= 0) {
-                clearInterval(intervalRef.current);
-              }
-              return newTime < 0 ? 0 : newTime;
+              return newTime < 0 ? 0 : newTime; //clamps countdown to 0
             }
           );
         },
         100
       );
       return () => {
-        clearInterval(intervalRef.current);
+        clearInterval(intervalTimer);
       };
     },
     []
   );
 
-  return <progress id="question-time" value={timerRemaining} max={duration} />;
+  return <progress id="question-time" value={timerRemaining} max={timer} className={answeredState !== '' ? 'answered' : undefined} />;
 };
 
 export default QuestionTimer;
