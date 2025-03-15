@@ -1,40 +1,15 @@
 import QuizCompletedImg from "../assets/quiz-complete.png";
-import QUESTIONS from "../questions.js";
 import { QuizContext } from "../context/quiz-context.jsx";
 import { useContext } from "react"; 
 
 const ResultsPanel = () => {
   const {
-    userAnswers,
-    resetQuiz
+    resetQuiz,
+    answersWithQuestions,
+    percentageSkipped,
+    percentageCorrect,
+    percentageIncorrect,
   } = useContext(QuizContext);
-
-
-  const answersWithQuestions = userAnswers.map(
-    ua => {
-      return {
-        ...ua,
-        question: QUESTIONS.find(
-          q => q.id === ua.questionId
-        )
-      };
-    }
-  );
-
-  const countSkipped = (userAnswers.filter(
-    (ua) => ua.answer === null
-  ))?.length;
-  const percentageSkipped = countSkipped ? (countSkipped / userAnswers.length) * 100 : 0;
-
-  const countCorrect = (userAnswers.filter(
-    (ua) => ua.result
-  ))?.length;
-  const percentageCorrect = countCorrect ? (countCorrect / userAnswers.length) * 100 : 0;
-
-  const countIncorrect = (userAnswers.filter(
-    (ua) => ua.answer !== null && !ua.result
-  ))?.length;
-  const percentageIncorrect = countIncorrect ? (countIncorrect / userAnswers.length) * 100 : 0;
 
   return (
     <>

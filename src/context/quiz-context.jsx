@@ -13,6 +13,10 @@ export const QuizContext = createContext({
   handleSkipAnswer: () => {},
   getClassState: () => {},
   resetQuiz: () => {},
+  answersWithQuestions: [],
+  percentageSkipped: 0,
+  percentageCorrect: 0,
+  percentageIncorrect: 0,
 });
 
 const shuffleArray = (Arr) => {
@@ -151,6 +155,36 @@ const QuizContextProvider = ({ children }) => {
     quizStateReducer({ type: "RESET_QUIZ" });
   };
 
+  const answersWithQuestions = quizState.userAnswers.map(
+    (ua) => {
+      return {
+        ...ua,
+        question: QUESTIONS.find(
+          (q) => q.id === ua.questionId
+        ),
+      };
+    }
+  );
+
+  const countSkipped = (quizState.userAnswers.filter(
+    (ua) => ua.answer === null
+  ))?.length;
+
+  const percentageSkipped = countSkipped ? (countSkipped / quizState.userAnswers.length) * 100 : 0;
+
+  const countCorrect = (quizState.userAnswers.filter(
+    (ua) => ua.result
+  ))?.length;
+
+  const percentageCorrect = countCorrect ? (countCorrect / quizState.userAnswers.length) * 100 : 0;
+
+  const countIncorrect = (quizState.userAnswers.filter(
+    (ua) => ua.answer !== null && !ua.result
+  ))?.length;
+
+  const percentageIncorrect = countIncorrect ? (countIncorrect / quizState.userAnswers.length) * 100 : 0;
+
+
   const quizCtx = {
     questionSource: QUESTIONS,
     questions: quizState.questions,
@@ -163,6 +197,10 @@ const QuizContextProvider = ({ children }) => {
     handleSkipAnswer,
     getClassState,
     resetQuiz,
+    answersWithQuestions,
+    percentageSkipped,
+    percentageCorrect,
+    percentageIncorrect,
   };
 
   return (
